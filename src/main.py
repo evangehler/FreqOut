@@ -1,10 +1,11 @@
 import numpy as np
 import scipy.io.wavfile as wav
+import soundfile as sf
 import matplotlib.pyplot as plt
 from matplotlib.ticker import ScalarFormatter
 
 # load audio file
-rate, data = wav.read("C:/Users/theja/OneDrive/Documents/Development/FreqOut/src/input.wav")
+data, rate = sf.read("src\Windowlicker.flac")
 
 # mono if stereo
 if data.ndim > 1:
