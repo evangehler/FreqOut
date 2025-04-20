@@ -13,7 +13,7 @@ Plotted example
 ---
 ![alt text](images/spectrogram_comparison.png)
 
-Comamand Line Output
+Command Line Output
 ---
 ![alt text](images/console_output.png)
 
