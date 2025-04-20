@@ -131,8 +131,8 @@ def plot_deltas(delta_slices, freqs_full):
 
 # Main
 def main():
-    original_path = "src/aphex_test.wav"
-    doped_path = "src/aphex_doped.wav"
+    original_path = "src/input.wav"
+    doped_path = "src/doped.wav"
 
     sr = 44100
 
@@ -161,7 +161,8 @@ def main():
     # When it was a single sine wave
     # guess_frequency(deltas, slices_doped[0].freqs)
     
-    
+    plot_spectrogram(slices_doped)
+    plot_spectrogram(slices_orig)
     decode_message(deltas, slices_doped[0].freqs)
     plot_deltas(deltas, slices_doped[0].freqs)
 
