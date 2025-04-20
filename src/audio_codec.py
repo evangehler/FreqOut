@@ -113,3 +113,29 @@ def decode_message(delta_slices, freqs_full, base_freq=4000, step=50, window=0.0
 
     print(f"\nDecoded message: {decoded_message}")
     return decoded_message
+
+
+#insert sinewave for testing (debug function)
+def dope_audio(input_path, output_path, frequency=5000, start_time=5.0, duration=0.5, amplitude=0.02):
+    # Load original
+    sr = 44100
+    y, _ = librosa.load(input_path, sr=sr, mono=True)
+
+    # Time window to insert sine
+    start_sample = int(start_time * sr)
+    end_sample = int((start_time + duration) * sr)
+
+    # Create sine
+    t = np.arange(end_sample - start_sample) / sr
+    sine_wave = amplitude * np.sin(2 * np.pi * frequency * t)
+
+    # Add sine to a copy
+    y_doped = np.copy(y)
+    y_doped[start_sample:end_sample] += sine_wave
+
+    # Clip to avoid overflow
+    y_doped = np.clip(y_doped, -1.0, 1.0)
+
+    # Save
+    sf.write(output_path, y_doped, sr)
+    print(f"Doped audio written to {output_path}")
