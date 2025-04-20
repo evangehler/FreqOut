@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 import librosa
 import hashlib
 import soundfile as sf
-from matplotlib.ticker import ScalarFormatter
 
 # Basic class for storing FFT bins
 class TimeSlice:
@@ -77,8 +76,8 @@ def compute_deltas(reference_slices, test_slices, threshold=0.05, precision=3):
 
     return delta_slices
 
-
-def dope_audio(input_path, output_path, frequency=2000, start_time=2.0, duration=0.5, amplitude=0.2):
+#insert sinewave for testing
+def dope_audio(input_path, output_path, frequency=2000, start_time=5.0, duration=0.5, amplitude=0.02):
     # Load original
     sr = 44100
     y, _ = librosa.load(input_path, sr=sr, mono=True)
@@ -119,6 +118,7 @@ def plot_spectrogram(slices):
     plt.grid(True, which='both', ls='--')
     plt.show()
 
+# Matplotlib function for deltaSlices
 def plot_deltas(delta_slices, freqs_full):
     times = []
     freqs = []
@@ -140,13 +140,36 @@ def plot_deltas(delta_slices, freqs_full):
     plt.ylim(20, 24000)
     plt.show()
 
+# Guess frequency based on weighted average of deltaSlices
+def guess_frequency(delta_slices, freqs_full):
+    if not delta_slices:
+        print("No delta slices to analyze.")
+        return
+
+    total_weight = 0.0
+    weighted_sum = 0.0
+
+    for ds in delta_slices:
+        freqs = freqs_full[ds.freq_indices]
+        mags = ds.magnitude_deltas
+        weighted_sum += np.sum(freqs * mags)
+        total_weight += np.sum(mags)
+
+    if total_weight == 0:
+        print("Sum equals zero — cannot estimate frequency.")
+        return
+
+    estimated_freq = weighted_sum / total_weight
+    print(f"Weighted average estimated frequency: {estimated_freq:.2f} Hz")
+
+# Main
 def main():
     original_path = "src/input.wav"
     doped_path = "src/doped.wav"
 
     # Inject sine tone
     sr = 44100
-    dope_audio(original_path, doped_path, frequency=2000, start_time=2.0, duration=0.5)
+    dope_audio(original_path, doped_path, frequency=2000, start_time=5.0, duration=0.5)
 
     # Compute TimeSlices
     slices_orig = compute_time_slice(original_path, sr=sr)
@@ -160,9 +183,11 @@ def main():
     for delta in deltas:
         freqs = slices_doped[0].freqs[delta.freq_indices]
         for f, d in zip(freqs, delta.magnitude_deltas):
-            print(f"Time: {delta.timestamp:.3f}s | Delta: {d:.3f} at {f:.1f} Hz")
+            print(f"Time: {delta.timestamp:.4f}s | Delta: {d:.3f} at {f:.1f} Hz")
     
+    guess_frequency(deltas, slices_doped[0].freqs)
     plot_deltas(deltas, slices_doped[0].freqs)
 
+# Main
 if __name__ == "__main__":
     main()
