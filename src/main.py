@@ -16,7 +16,7 @@ def compute_time_slice(filename, sr = 44100, n_fft=2048, hop_length=512):
     stft_matrix = librosa.stft(y, n_fft=n_fft, hop_length=hop_length)
     #matrix of frequency magnitudes
     magnitude_matrix = np.abs(stft_matrix)
-    
+
     freqs = librosa.fft_frequencies(sr=sr, n_fft=n_fft)
     times = librosa.frames_to_time(np.arange(magnitude_matrix.shape[1]), sr=sr, hop_length=hop_length)
 
@@ -45,7 +45,7 @@ def plot_spectrogram(slices):
     plt.show()
 
 def main():
-    slices = compute_time_slice("src/input.wav")
+    slices = compute_time_slice("src/aphex_test.wav")
     print(f"{len(slices)} time slices extracted.")
     print(f"Sample slice: Time = {slices[0].timestamp:.3f}s, First frequency = {slices[0].freqs[0]:.1f}Hz, First mag = {slices[0].magnitudes[0]:.3f}")
 
