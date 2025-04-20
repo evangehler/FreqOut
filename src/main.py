@@ -161,8 +161,6 @@ def main():
     # When it was a single sine wave
     # guess_frequency(deltas, slices_doped[0].freqs)
     
-    plot_spectrogram(slices_doped)
-    plot_spectrogram(slices_orig)
     decode_message(deltas, slices_doped[0].freqs)
     plot_deltas(deltas, slices_doped[0].freqs)
 
