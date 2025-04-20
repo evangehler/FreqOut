@@ -7,7 +7,13 @@ sinewaves. Decoding is implemented by resolving delta slice frequency.
 
 Visualizations are created with matplotlib
 
-Future updates include CLI or GUI
+Future updates include CLI or GUI to implement:
+- Audio file loading / saving
+- Custom message encoding and decoding w/ base frequency variation
+- Variable FFT window resolution
+
+Additionally:
+- Optimization of comparison algorithm via custom hashing function
 
 Plotted example  
 ---

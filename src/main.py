@@ -74,7 +74,7 @@ def main():
     sr = 44100
 
     # ENCODE MESSAGE
-    encode_message("we love a good secret message", original_path, doped_path)
+    encode_message("zebras are just striped horses", original_path, doped_path)
 
     # Compute TimeSlices for both files
     slices_orig = compute_time_slice(original_path, sr=sr)

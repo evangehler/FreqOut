@@ -17,7 +17,7 @@ def resolve_frequency(delta_slice, freqs_full):
     return weighted_freq
 
 # Encode character to frequency
-def char_to_freq(c, base=4000, step=50):
+def char_to_freq(c, base=10000, step=50):
     if c == ' ':
         return base + 26 * step
     c = c.lower()
@@ -26,7 +26,7 @@ def char_to_freq(c, base=4000, step=50):
     raise ValueError(f"Unsupported character: {c}")
 
 # Decode characters from frequencies
-def freq_to_char(freq, base=4000, step=50):
+def freq_to_char(freq, base=10000, step=50):
     index = round((freq - base) / step)
     if 0 <= index < 26:
         return chr(ord('a') + index)
@@ -64,7 +64,7 @@ def encode_message(message, input_path, output_path):
     print(f"Encoded message written to {output_path}")
 
 # Decode Message using DeltaSlice and frequency resolution function
-def decode_message(delta_slices, freqs_full, base_freq=4000, step=50, window=0.005):
+def decode_message(delta_slices, freqs_full, base_freq=10000, step=50, window=0.005):
 
     if not delta_slices:
         print("No delta slices to decode.")
