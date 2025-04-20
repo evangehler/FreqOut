@@ -4,22 +4,11 @@ import librosa
 import hashlib
 import soundfile as sf
 
-# Basic class for storing FFT bins
-class TimeSlice:
-    def __init__(self, timestamp, freqs, magnitudes):
-        self.timestamp = timestamp
-        self.freqs = freqs
-        self.magnitudes = magnitudes
-
-# Essentially the same class as Timeslice, holds slices that have differences
-class DeltaSlice:
-    def __init__(self, timestamp, freq_indices, magnitude_deltas):
-        self.timestamp = timestamp
-        self.freq_indices = freq_indices
-        self.magnitude_deltas = magnitude_deltas
+from classes import DeltaSlice, TimeSlice
+from audio_codec import encode_message, decode_message
 
 # Function iterates through audio file, computing and saving results of FFTs
-def compute_time_slice(filename, sr = 44100, n_fft=256, hop_length=64):
+def compute_time_slice(filename, sr = 44100, n_fft=1024, hop_length=64):
     #ignore sr / make mono
     y, _ = librosa.load(filename, sr=sr, mono=True)
     #matrix of our fft bins
@@ -77,7 +66,7 @@ def compute_deltas(reference_slices, test_slices, threshold=0.05, precision=3):
     return delta_slices
 
 #insert sinewave for testing
-def dope_audio(input_path, output_path, frequency=2000, start_time=5.0, duration=0.5, amplitude=0.02):
+def dope_audio(input_path, output_path, frequency=5000, start_time=5.0, duration=0.5, amplitude=0.02):
     # Load original
     sr = 44100
     y, _ = librosa.load(input_path, sr=sr, mono=True)
@@ -140,52 +129,40 @@ def plot_deltas(delta_slices, freqs_full):
     plt.ylim(20, 24000)
     plt.show()
 
-# Guess frequency based on weighted average of deltaSlices
-def guess_frequency(delta_slices, freqs_full):
-    if not delta_slices:
-        print("No delta slices to analyze.")
-        return
-
-    total_weight = 0.0
-    weighted_sum = 0.0
-
-    for ds in delta_slices:
-        freqs = freqs_full[ds.freq_indices]
-        mags = ds.magnitude_deltas
-        weighted_sum += np.sum(freqs * mags)
-        total_weight += np.sum(mags)
-
-    if total_weight == 0:
-        print("Sum equals zero — cannot estimate frequency.")
-        return
-
-    estimated_freq = weighted_sum / total_weight
-    print(f"Weighted average estimated frequency: {estimated_freq:.2f} Hz")
-
 # Main
 def main():
-    original_path = "src/input.wav"
-    doped_path = "src/doped.wav"
+    original_path = "src/aphex_test.wav"
+    doped_path = "src/aphex_doped.wav"
+
+    sr = 44100
 
     # Inject sine tone
-    sr = 44100
-    dope_audio(original_path, doped_path, frequency=2000, start_time=5.0, duration=0.5)
+    # dope_audio(original_path, doped_path, frequency=5000, start_time=5.0, duration=0.5)
+
+    # ENCODE MESSAGE
+    encode_message("we love a good secret message", original_path, doped_path)
 
     # Compute TimeSlices
     slices_orig = compute_time_slice(original_path, sr=sr)
     slices_doped = compute_time_slice(doped_path, sr=sr)
 
-    #Compare and get DeltaSlices
+    #DeltaSlices
     deltas = compute_deltas(slices_orig, slices_doped, threshold=0.05)
 
     # Send differences to console / update
     print(f"{len(deltas)} slices had differences.")
-    for delta in deltas:
-        freqs = slices_doped[0].freqs[delta.freq_indices]
-        for f, d in zip(freqs, delta.magnitude_deltas):
-            print(f"Time: {delta.timestamp:.4f}s | Delta: {d:.3f} at {f:.1f} Hz")
     
-    guess_frequency(deltas, slices_doped[0].freqs)
+    # For print debugging
+    # for delta in deltas:
+    #     freqs = slices_doped[0].freqs[delta.freq_indices]
+    #     for f, d in zip(freqs, delta.magnitude_deltas):
+    #         print(f"Time: {delta.timestamp:.4f}s | Delta: {d:.3f} at {f:.1f} Hz")
+    
+    # When it was a single sine wave
+    # guess_frequency(deltas, slices_doped[0].freqs)
+    
+    
+    decode_message(deltas, slices_doped[0].freqs)
     plot_deltas(deltas, slices_doped[0].freqs)
 
 # Main
