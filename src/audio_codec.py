@@ -113,3 +113,4 @@ def decode_message(delta_slices, freqs_full, base_freq=4000, step=50, window=0.0
         decoded_message += decoded_char
 
     print(f"\nDecoded message: {decoded_message}")
+    return decoded_message
