@@ -1,36 +1,55 @@
 import numpy as np
-import scipy.io.wavfile as wav
-import soundfile as sf
 import matplotlib.pyplot as plt
+import librosa
 from matplotlib.ticker import ScalarFormatter
 
-# load audio file
-data, rate = sf.read("src\Windowlicker.flac")
+class TimeSlice:
+    def __init__(self, timestamp, freqs, magnitudes):
+        self.timestamp = timestamp
+        self.freqs = freqs
+        self.magnitudes = magnitudes
 
-# mono if stereo
-if data.ndim > 1:
-    data = data.mean(axis=1)
+def compute_time_slice(filename, sr = 44100, n_fft=2048, hop_length=512):
+    #ignore sr / make mono
+    y, _ = librosa.load(filename, sr=sr, mono=True)
+    #matrix of our fft bins
+    stft_matrix = librosa.stft(y, n_fft=n_fft, hop_length=hop_length)
+    #matrix of frequency magnitudes
+    magnitude_matrix = np.abs(stft_matrix)
+    
+    freqs = librosa.fft_frequencies(sr=sr, n_fft=n_fft)
+    times = librosa.frames_to_time(np.arange(magnitude_matrix.shape[1]), sr=sr, hop_length=hop_length)
 
-# apply FFT
-fft_vals = np.fft.fft(data)
-freqs = np.fft.fftfreq(len(data), 1/rate)
+    slices = []
+    for i,t in enumerate(times):
+        magnitudes = magnitude_matrix[:,i]
+        slices.append(TimeSlice(timestamp=t, freqs=freqs, magnitudes=magnitudes))
 
-# only positive frequencies
-mask = (freqs >= 0) & (freqs <= 24000)
-fft_vals = np.abs(fft_vals[mask])
-freqs = freqs[mask]
+    return slices
 
-# Define desired tick positions
-tick_positions = [20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000]
+# Basic spectrogram to see if STFT worked
+def plot_spectrogram(slices):
+    time_stamps = [s.timestamp for s in slices]
+    magnitudes = np.array([s.magnitudes for s in slices]).T
 
-# Create the plot
-plt.figure()
-plt.semilogx(freqs, fft_vals)
-plt.xlim(20, 24000)
-plt.xticks(tick_positions)
-plt.gca().xaxis.set_major_formatter(ScalarFormatter())
-plt.xlabel("Frequency (Hz)")
-plt.ylabel("Magnitude")
-plt.title("Average Frequencies In Signal")
-plt.grid(True, which='both', ls='--')
-plt.show()
+    plt.figure(figsize=(10, 4))
+    plt.imshow(20 * np.log10(magnitudes + 1e-6), aspect='auto', origin='lower',
+               extent=[time_stamps[0], time_stamps[-1], slices[0].freqs[0], slices[0].freqs[-1]])
+    plt.xlabel("Time (s)")
+    plt.ylabel("Frequency (Hz)")
+    plt.colorbar(label="Magnitude (dB)")
+    plt.title("Spectrogram")
+    plt.ylim(20, 24000)
+    plt.yscale('log')
+    plt.grid(True, which='both', ls='--')
+    plt.show()
+
+def main():
+    slices = compute_time_slice("src/input.wav")
+    print(f"{len(slices)} time slices extracted.")
+    print(f"Sample slice: Time = {slices[0].timestamp:.3f}s, First frequency = {slices[0].freqs[0]:.1f}Hz, First mag = {slices[0].magnitudes[0]:.3f}")
+
+    plot_spectrogram(slices)
+
+if __name__ == "__main__":
+    main()
