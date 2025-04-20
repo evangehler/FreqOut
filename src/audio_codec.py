@@ -16,7 +16,6 @@ def resolve_frequency(delta_slice, freqs_full):
     weighted_freq = np.sum(freqs * mags) / total_weight
     return weighted_freq
 
-# ENCODE / DECODE FUNCTIONALITY
 # Encode character to frequency
 def char_to_freq(c, base=4000, step=50):
     if c == ' ':
