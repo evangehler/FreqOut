@@ -1,10 +1,10 @@
 import tkinter as tk
 from tkinter import filedialog as fd
+
 class GUI:
     message = None
     inFile = None
     outFile = None
-
 
     def __init__(self):
         #initalize root/window
@@ -21,12 +21,11 @@ class GUI:
         self.messageInstr.pack(padx=30, pady=5)
         self.messagebox = tk.Entry(self.root)
         self.messagebox.pack( padx=0, pady=0)
-        self.messagebox.bind("<Return>", self.enter_on_press)
+       
+        #--> Replaced, now whatever text is in box will be message, no need to hit enter
+        # self.messagebox.bind("<Return>", self.enter_on_press)
 
         #both buttons to select files from computer
-
-
-
 
         self.inFileInstruction = tk.Label(self.root, text="Select your input file (.wav)", font=("Impact", 16), fg="silver", bg="dark green")
         self.inFileInstruction.pack(padx=30, pady=5)
@@ -41,14 +40,21 @@ class GUI:
         self.filebutton2 = tk.Button(self.root, text="Select .wav file", command=self.select_outfile, font=("Arial"),fg="black", bg="grey")
         self.filebutton2.pack(padx=30)
 
+        # Run Button
+        self.runButton = tk.Button(self.root, text="Run", command=self.run_backend, font=("Arial"), fg="white", bg="black")
+        self.runButton.pack(pady=20)
+
 
         self.root.mainloop()
-    def enter_on_press(self, event):
-        encoded_message = self.messagebox.get()
-        message = encoded_message
-        self.messagebox.delete(first=0, last=len(encoded_message))
-        self.messagebox.configure(state="disabled")
 
+    # Message will be whatever is in text box 
+    # def enter_on_press(self, event):
+    #     encoded_message = self.messagebox.get()
+    #     self.message = encoded_message
+    #     self.messagebox.delete(first=0, last=len(encoded_message))
+    #     self.messagebox.configure(state="disabled")
+
+    
     def select_infile(self):
         file_path = fd.askopenfilename(
             title="Select a file, must be .wav",
@@ -56,7 +62,8 @@ class GUI:
         )
         if file_path:
             print(f"File selected: {file_path}")
-            inFile = file_path
+            self.inFile = file_path
+    
     def select_outfile(self):
         file_path = fd.askopenfilename(
             title="Select a file, must be .wav",
@@ -64,4 +71,11 @@ class GUI:
         )
         if file_path:
             print(f"File selected: {file_path}")
-            outFile = file_path
+            self.outFile = file_path
+    
+    def run_backend(self):
+        self.message = self.messagebox.get()
+        if self.message and self.inFile and self.outFile:
+            self.root.destroy()
+        else:
+            print("Missing input. Please enter a message and select both files.")

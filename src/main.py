@@ -67,24 +67,26 @@ def compute_deltas(reference_slices, test_slices, threshold=0.05, precision=3):
 
 # Main
 def main():
-    # PATHS
-    window = GUI()
-    original_path = "src/audio_files/input.wav"
-    doped_path = "src/audio_files/doped.wav"
+    # Launch GUI
+    gui = GUI()
 
-    # SAMPLE RATE
-    sr = 44100
+    message = gui.message
+    original_path = gui.inFile
+    doped_path = gui.outFile
 
-    # ENCODE MESSAGE
-    encode_message("zebras are just striped horses", original_path, doped_path)
+    if not all([message, original_path, doped_path]):
+        print("Missing required input from GUI.")
+        return
 
-    # Compute TimeSlices for both files
-    slices_orig = compute_time_slice(original_path, sr=sr)
-    slices_doped = compute_time_slice(doped_path, sr=sr)
+    # Encode
+    encode_message(message, original_path, doped_path)
 
-    # Compute DeltaSlices
+    # Analyze
+    slices_orig = compute_time_slice(original_path)
+    slices_doped = compute_time_slice(doped_path)
     deltas = compute_deltas(slices_orig, slices_doped, threshold=0.05)
 
+    # Decode & Plot
     decoded = decode_message(deltas, slices_doped[0].freqs)
     plot_stack(slices_orig, slices_doped, deltas, decoded_message=decoded)
  
