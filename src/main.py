@@ -1,11 +1,16 @@
 import numpy as np
+import matplotlib
+matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
+
 import librosa
 import hashlib
 import soundfile as sf
 
 from classes import DeltaSlice, TimeSlice
 from audio_codec import encode_message, decode_message
+
+from gui import GUI
 
 # Function iterates through audio file, computing and saving results of FFTs
 def compute_time_slice(filename, sr = 44100, n_fft=1024, hop_length=64):
@@ -131,6 +136,9 @@ def plot_deltas(delta_slices, freqs_full):
 
 # Main
 def main():
+    gui = GUI()
+
+    return 0 #remember to delete this
     original_path = "src/aphex_test.wav"
     doped_path = "src/aphex_doped.wav"
 
@@ -140,7 +148,7 @@ def main():
     # dope_audio(original_path, doped_path, frequency=5000, start_time=5.0, duration=0.5)
 
     # ENCODE MESSAGE
-    encode_message("we love a good secret message", original_path, doped_path)
+    encode_message("we love thomas miller", original_path, doped_path)
 
     # Compute TimeSlices
     slices_orig = compute_time_slice(original_path, sr=sr)
