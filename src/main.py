@@ -5,6 +5,7 @@ import hashlib
 from classes import DeltaSlice, TimeSlice
 from audio_codec import encode_message, decode_message
 from plotting import plot_spectrogram, plot_deltas, plot_stack
+from gui import GUI
 
 # Function iterates through audio file, computing and saving results of FFTs
 def compute_time_slice(filename, sr = 44100, n_fft=1024, hop_length=64):
@@ -67,6 +68,7 @@ def compute_deltas(reference_slices, test_slices, threshold=0.05, precision=3):
 # Main
 def main():
     # PATHS
+    window = GUI()
     original_path = "src/audio_files/input.wav"
     doped_path = "src/audio_files/doped.wav"
 
