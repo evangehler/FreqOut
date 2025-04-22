@@ -193,8 +193,8 @@ class GUI:
     def run_backend(self):
         self.message = self.messagebox.get()
         if self.message and self.inFile and self.outFile:
-            if self.callback:
-                self.callback(self.message, self.inFile, self.outFile)
+            if self.encode_callback:
+                self.encode_callback(self.message, self.inFile, self.outFile)
         else:
             print("Missing input. Please enter a message and select both files.")
 
