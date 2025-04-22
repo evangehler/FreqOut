@@ -7,29 +7,42 @@ sinewaves. Decoding is implemented by resolving delta slice frequency.
 
 Visualizations are created with matplotlib
 
-Future updates include CLI or GUI to implement:
-- Audio file loading / saving
-- Custom message encoding and decoding w/ base frequency variation
-- Variable FFT window resolution
+**Recent Updates**
+- GUI implementation with Tkinter
+- Custom message encoding
 
-Additionally:
+**Future updates**:
+- Variable FFT window resolution
 - Optimization of comparison algorithm via custom hashing function
 
-Plotted example  
+Current Working Interface 
 ---
-![alt text](images/spectrogram_comparison.png)
+![alt text](images/current_interface.png)
 
-Command Line Output
+**Installation**
 ---
-![alt text](images/console_output.png)
+Program utilizes python and pip for package management
 
-**Required packages**
----
+First, clone and open repository:
+```
+git clone https://github.com/evangehler/FreqOut.git
+cd FreqOut
+```
+Then install required dependencies via pip:
+```
+pip install -r requirements.txt
+```
+If this does not work on your machine, manually install with:
+```
+pip install numpy librosa matplotlib soundfile tkinter
+```
+Finally, navigate to source folder and run program
+```
+cd src
+python main.py
+```
 
-- matplotlib
-- numpy
-- librosa
-- soundfile
+
 
 **Project Collaborators**
 ---
