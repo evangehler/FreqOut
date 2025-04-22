@@ -1,6 +1,5 @@
 import numpy as np
 import librosa
-import hashlib
 import sys
 
 from classes import DeltaSlice, TimeSlice
@@ -27,10 +26,18 @@ def compute_time_slice(filename, sr = 44100, n_fft=1024, hop_length=64):
 
     return slices
 
-# Hash Function with hashlib
+# Hash Function
 def hash_magnitudes(magnitudes, precision=3):
     rounded = np.round(magnitudes, decimals=precision)
-    return hashlib.md5(rounded.tobytes()).hexdigest()
+    # Convert magnitudes to a flat array of bytes
+    flattened = rounded.flatten()
+    hash_value = 0
+    for val in flattened:
+        # Use XOR to mix the bits of the hashed value and 10^6 for high resolution and uniqueness
+        hash_value ^= int(val * 1e6)
+        # Bitshift multiplication by 32 and adding the original value for entropy (randomness)
+        hash_value = (hash_value << 5) + hash_value
+    return hex(hash_value & 0xFFFFFFFFFFFFFFFF)  # Return a 64-bit hash as hex
 
 # Function compares two arrays of slices and stores the resulting slices.
 def compute_deltas(reference_slices, test_slices, threshold=0.05, precision=3):
