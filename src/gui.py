@@ -54,7 +54,10 @@ class GUI:
         self.decode_tab = ttk.Frame(self.notebook) # DECODE TAB
 
         self.notebook.add(self.encode_tab, text='Encode Messages') # ENCODE TAB
-        self.notebook.add(self.decode_tab, text='Decode Messages') # DECODE TAB?
+        self.notebook.add(self.decode_tab, text='Decode Messages') # DECODE TAB
+
+        # Which tab we are in
+        self.notebook.bind("<<NotebookTabChanged>>", self.update_console_redirect)
 
         # =============== ENOCDE TAB ================== #
         # ===== Frame for inputs, all in one row-block container ===== #
@@ -126,8 +129,8 @@ class GUI:
         self.decode_button.pack(pady=10)
 
         # Console Output
-        self.console = scrolledtext.ScrolledText(self.decode_tab, wrap=tk.WORD, width=120, height=70, font=("Courier", 10))
-        self.console.pack(padx=10, pady=20)
+        self.decode_console = scrolledtext.ScrolledText(self.decode_tab, wrap=tk.WORD, width=120, height=70, font=("Courier", 10))
+        self.decode_console.pack(padx=10, pady=20)
 
 
 
@@ -165,24 +168,37 @@ class GUI:
             self.outFile = file_path
             print(f"Encoded audio saved to: {file_path}")
     
+    # Select File (Decode)
     def select_decode_infile(self):
         path = fd.askopenfilename(title="Select original audio")
         if path:
             print(f"Original file selected: {path}")
             self.decode_infile = path
 
+    # Select Encoded File (Decode)
     def select_decode_outfile(self):
         path = fd.askopenfilename(title="Select encoded audio")
         if path:
             print(f"Encoded file selected: {path}")
             self.decode_outfile = path
 
+    # Run Decode
     def run_decode(self):
         if hasattr(self, 'decode_infile') and hasattr(self, 'decode_outfile'):
             if self.decode_callback:
                 self.decode_callback(self.decode_infile, self.decode_outfile)
         else:
             print("Please select both original and encoded files.")
+
+    def update_console_redirect(self, event=None):
+        current_tab = self.notebook.index(self.notebook.select())
+        if current_tab == 0:
+            sys.stdout = ConsoleRedirect(self.console, sys.__stdout__)
+            sys.stderr = ConsoleRedirect(self.console, sys.__stderr__)
+        elif current_tab == 1:
+            sys.stdout = ConsoleRedirect(self.decode_console, sys.__stdout__)
+            sys.stderr = ConsoleRedirect(self.decode_console, sys.__stderr__)
+
 
     # Callback handler
     def set_callbacks(self, encode_fn, decode_fn):
