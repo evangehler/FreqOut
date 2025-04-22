@@ -22,7 +22,8 @@ class GUI:
     message = None
     inFile = None
     outFile = None
-    callback = None
+    encode_callback = None
+    decode_callback = None
 
     # Main Configuration
     def __init__(self):
@@ -108,6 +109,26 @@ class GUI:
         self.frame_top = ttk.Frame(self.decode_tab)
         self.frame_top.pack(pady=20, padx=40, fill='x')
 
+        # Input File Row
+        self.decode_in_frame = ttk.Frame(self.frame_top)
+        self.decode_in_frame.pack(anchor='w', pady=5)
+
+        ttk.Label(self.decode_in_frame, text="Original File:").grid(row=0, column=0, padx=5)
+        self.decode_in_button = ttk.Button(self.decode_in_frame, text="Browse...", command=self.select_decode_infile)
+        self.decode_in_button.grid(row=0, column=1)
+
+        ttk.Label(self.decode_in_frame, text="Encoded File:").grid(row=1, column=0, padx=5)
+        self.decode_out_button = ttk.Button(self.decode_in_frame, text="Browse...", command=self.select_decode_outfile)
+        self.decode_out_button.grid(row=1, column=1)
+
+        # Decode Button
+        self.decode_button = ttk.Button(self.frame_top, text="Decode Message", command=self.run_decode)
+        self.decode_button.pack(pady=10)
+
+        # Console Output
+        self.console = scrolledtext.ScrolledText(self.decode_tab, wrap=tk.WORD, width=120, height=70, font=("Courier", 10))
+        self.console.pack(padx=10, pady=20)
+
 
 
 
@@ -122,7 +143,7 @@ class GUI:
         self.messagebox.configure(state='readonly')
         self.confirm_button.configure(state='disabled')
  
-    # Select Input
+    # Select Input (Encode)
     def select_infile(self):
         file_path = fd.askopenfilename(
             title="Select a file, must be .wav",
@@ -132,7 +153,7 @@ class GUI:
             print(f"Input file selected: {file_path}")
             self.inFile = file_path
     
-    # Select or Create Output
+    # Select or Create Output (Encode)
     def select_outfile(self):
         file_path = fd.asksaveasfilename(
             title="Select a file, must be .wav",
@@ -144,6 +165,30 @@ class GUI:
             self.outFile = file_path
             print(f"Encoded audio saved to: {file_path}")
     
+    def select_decode_infile(self):
+        path = fd.askopenfilename(title="Select original audio")
+        if path:
+            print(f"Original file selected: {path}")
+            self.decode_infile = path
+
+    def select_decode_outfile(self):
+        path = fd.askopenfilename(title="Select encoded audio")
+        if path:
+            print(f"Encoded file selected: {path}")
+            self.decode_outfile = path
+
+    def run_decode(self):
+        if hasattr(self, 'decode_infile') and hasattr(self, 'decode_outfile'):
+            if self.decode_callback:
+                self.decode_callback(self.decode_infile, self.decode_outfile)
+        else:
+            print("Please select both original and encoded files.")
+
+    # Callback handler
+    def set_callbacks(self, encode_fn, decode_fn):
+        self.encode_callback = encode_fn
+        self.decode_callback = decode_fn
+
     # Run
     def run_backend(self):
         self.message = self.messagebox.get()

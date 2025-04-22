@@ -66,15 +66,18 @@ def compute_deltas(reference_slices, test_slices, threshold=0.05, precision=3):
     print(f"{len(delta_slices)} slices had differences.")
     return delta_slices
 
-def run_all(message, original_path, doped_path):
-    print("Running FreqOut pipeline...")
+def run_encode(message, original_path, doped_path):
+    print("Encoding message...")
     encode_message(message, original_path, doped_path)
-    
-    slices_orig = compute_time_slice(original_path)
-    slices_doped = compute_time_slice(doped_path)
-    
+    print("Done encoding.")
+
+def run_decode(reference_path, test_path):
+    print("Running decode pipeline...")
+    slices_orig = compute_time_slice(reference_path)
+    slices_doped = compute_time_slice(test_path)
+
     deltas = compute_deltas(slices_orig, slices_doped)
-    
+
     decoded = decode_message(deltas, slices_doped[0].freqs)
     plot_stack(slices_orig, slices_doped, deltas, decoded_message=decoded)
 
@@ -82,7 +85,7 @@ def main():
     gui = GUI()
     sys.stdout = ConsoleRedirect(gui.console, sys.__stdout__)
     sys.stderr = ConsoleRedirect(gui.console, sys.__stderr__)
-    gui.callback = run_all
+    gui.set_callbacks(run_encode, run_decode)
     gui.root.mainloop()
 
 if __name__ == "__main__":
