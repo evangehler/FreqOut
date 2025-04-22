@@ -18,59 +18,77 @@ class ConsoleRedirect:
         self.original_stream.flush()
 # Main GUI
 class GUI:
+    # I/O
     message = None
     inFile = None
     outFile = None
     callback = None
 
+    # Main Configuration
     def __init__(self):
         
         # Window Size / Config
         self.root = tk.Tk()
-        self.root.geometry('1000x800')
+        self.root.geometry('800x800')
         self.root.title("FreqOut")
         self.root.configure(background='dark green')
         
         # Style
         style = ttk.Style(self.root)
         style.theme_use('clam')
-        style.configure('TLabel', background='dark green', foreground='silver', font=('Impact', 16))
+        style.configure('TLabel', foreground='gray', font=('Helvetica', 16))
         style.configure('TButton', font=('Arial', 12), padding=5)
-        style.configure('TEntry', font=('Courier New', 12))
+        style.configure('TEntry', font=('Courier New', 16))
 
         # Title
-        self.title = ttk.Label(self.root, text="FreqOut", font=("Impact", 64))
-        self.title.pack(padx=30, pady=30)
+        self.title = ttk.Label(self.root, text="FreqOut!", foreground='silver', background='dark green', font=("Impact", 64))
+        self.title.pack(padx=30, pady=20)
         
-        # Message input
-        self.messageInstr = ttk.Label(self.root, text="Enter message you would like to encode (50 char max)")
-        self.messageInstr.pack(pady=5)
-        self.messagebox = ttk.Entry(self.root, width=60)
-        self.messagebox.pack()
-        
-        # Hit button or enter to input mesage
-        self.confirm_button = ttk.Button(self.root, text="Confirm Message", command=self.confirm_message)
-        self.confirm_button.pack(pady=5)
+        # ===== Frame for inputs, all in one row-block container =====
+        self.frame_top = ttk.Frame(self.root)
+        self.frame_top.pack(pady=20, padx=40, fill='x')
+
+        # Message Entry Row
+        self.message_frame = ttk.Frame(self.frame_top)
+        self.message_frame.pack(anchor='w', pady=5)
+
+        self.messageInstr = ttk.Label(self.message_frame, text="Message:")
+        self.messageInstr.grid(row=0, column=0, padx=5)
+
+        self.messagebox = ttk.Entry(self.message_frame, width=60)
+        self.messagebox.grid(row=0, column=1)
         self.messagebox.bind("<Return>", lambda event: self.confirm_message())
 
-        # Input file
-        self.inFileInstruction = ttk.Label(self.root, text="Select your input file (.wav)")
-        self.inFileInstruction.pack(pady=10)
-        self.filebutton1 = ttk.Button(self.root, text="Select .wav file", command=self.select_infile)
-        self.filebutton1.pack()
+        # Confirm Button
+        self.confirm_button = ttk.Button(self.message_frame, text="Confirm Message", command=self.confirm_message)
+        self.confirm_button.grid(row=0, column=2, padx=5)
 
-        # Output file
-        self.outFileInstruction = ttk.Label(self.root, text="Select your write-to file")
-        self.outFileInstruction.pack(pady=10)
-        self.filebutton2 = ttk.Button(self.root, text="Select .wav file", command=self.select_outfile)
-        self.filebutton2.pack()
+        # Input File Row
+        self.in_file_frame = ttk.Frame(self.frame_top)
+        self.in_file_frame.pack(anchor='w', pady=5)
+
+        self.inFileInstruction = ttk.Label(self.in_file_frame, text="Input File:")
+        self.inFileInstruction.grid(row=0, column=0, padx=5)
+
+        self.filebutton1 = ttk.Button(self.in_file_frame, text="Browse...", command=self.select_infile)
+        self.filebutton1.grid(row=0, column=1)
+
+        # Output File Row
+        self.out_file_frame = ttk.Frame(self.frame_top)
+        self.out_file_frame.pack(anchor='w', pady=5)
+
+        self.outFileInstruction = ttk.Label(self.out_file_frame, text="Output File:")
+        self.outFileInstruction.grid(row=0, column=0, padx=5)
+
+        self.filebutton2 = ttk.Button(self.out_file_frame, text="Save As...", command=self.select_outfile)
+        self.filebutton2.grid(row=0, column=1)
 
         # Run Button
-        self.runButton = ttk.Button(self.root, text="Run", command=self.run_backend)
-        self.runButton.pack(pady=20)
+        self.runButton = ttk.Button(self.frame_top, text="Run", command=self.run_backend)
+        self.runButton.pack(pady=10)
 
         # Console Output
-        self.console = scrolledtext.ScrolledText(self.root, wrap=tk.WORD, width=100, height=100, font=("Courier", 10))
+        self.console = scrolledtext.ScrolledText(self.root, wrap=tk.WORD, width=120, height=100, font=("Courier", 10))
         self.console.pack(padx=10, pady=20)
 
         # self.root.mainloop()
@@ -85,8 +103,8 @@ class GUI:
         print(f"Message to encode: {self.message}")
         self.messagebox.configure(state='readonly')
         self.confirm_button.configure(state='disabled')
-
-    
+ 
+    # Select Input
     def select_infile(self):
         file_path = fd.askopenfilename(
             title="Select a file, must be .wav",
@@ -96,6 +114,7 @@ class GUI:
             print(f"Input file selected: {file_path}")
             self.inFile = file_path
     
+    # Select or Create Output
     def select_outfile(self):
         file_path = fd.asksaveasfilename(
             title="Select a file, must be .wav",
@@ -107,6 +126,7 @@ class GUI:
             self.outFile = file_path
             print(f"Encoded audio saved to: {file_path}")
     
+    # Run
     def run_backend(self):
         self.message = self.messagebox.get()
         if self.message and self.inFile and self.outFile:
