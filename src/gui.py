@@ -27,6 +27,7 @@ class GUI:
     # Main Configuration
     def __init__(self):
         
+    
         # Window Size / Config
         self.root = tk.Tk()
         self.root.geometry('725x800')
@@ -37,15 +38,27 @@ class GUI:
         style = ttk.Style(self.root)
         style.theme_use('clam')
         style.configure('TLabel', foreground='gray', font=('Helvetica', 16))
-        style.configure('TButton', font=('Arial', 12), padding=5)
+        style.configure('TButton', font=('Helvetica', 12), padding=5)
         style.configure('TEntry', font=('Courier New', 16))
 
         # Title
         self.title = ttk.Label(self.root, text="FreqOut!", foreground='silver', background='dark green', font=("Impact", 64))
         self.title.pack(padx=30, pady=20)
-        
-        # ===== Frame for inputs, all in one row-block container =====
-        self.frame_top = ttk.Frame(self.root)
+
+
+        # ====== Instantiate Tab System ======== #
+        self.notebook = ttk.Notebook(self.root)
+        self.notebook.pack(expand=1, fill='both', padx=10, pady=10)
+
+        self.encode_tab = ttk.Frame(self.notebook) # ENCODE TAB
+        self.output_tab = ttk.Frame(self.notebook) # DECODE TAB
+
+        self.notebook.add(self.encode_tab, text='Encode Messages') # ENCODE TAB
+        self.notebook.add(self.output_tab, text='Output') # DECODE TAB?
+
+
+        # ===== Frame for inputs, all in one row-block container ===== #
+        self.frame_top = ttk.Frame(self.encode_tab)
         self.frame_top.pack(pady=20, padx=40, fill='x')
 
         # Message Entry Row
@@ -88,7 +101,7 @@ class GUI:
         self.runButton.pack(pady=10)
 
         # Console Output
-        self.console = scrolledtext.ScrolledText(self.root, wrap=tk.WORD, width=120, height=70, font=("Courier", 10))
+        self.console = scrolledtext.ScrolledText(self.output_tab, wrap=tk.WORD, width=120, height=70, font=("Courier", 10))
         self.console.pack(padx=10, pady=20)
 
         # self.root.mainloop()
