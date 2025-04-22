@@ -80,7 +80,7 @@ class GUI:
         self.in_file_frame.pack(anchor='w', pady=5)
 
         self.inFileInstruction = ttk.Label(self.in_file_frame, text="Input File:")
-        self.inFileInstruction.grid(row=0, column=0, padx=5)
+        self.inFileInstruction.grid(row=0, column=0, padx=11)
 
         self.filebutton1 = ttk.Button(self.in_file_frame, text="Browse...", command=self.select_infile)
         self.filebutton1.grid(row=0, column=1)
