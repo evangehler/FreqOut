@@ -1,6 +1,6 @@
 import tkinter as tk
-from tkinter import filedialog as fd
-from tkinter import scrolledtext
+from tkinter import filedialog as fd, scrolledtext
+from tkinter import ttk
 import sys
 
 # Class for Console Output
@@ -18,61 +18,73 @@ class ConsoleRedirect:
         self.original_stream.flush()
 # Main GUI
 class GUI:
+    message = None
+    inFile = None
+    outFile = None
+    callback = None
+
     def __init__(self):
-        self.message = None
-        self.inFile = None
-        self.outFile = None
-        self.callback = None
-
-
+        
+        # Window Size / Config
         self.root = tk.Tk()
-        self.root.geometry('1000x600')
+        self.root.geometry('1000x800')
         self.root.title("FreqOut")
         self.root.configure(background='dark green')
-        #title
-        self.title = tk.Label(self.root, text="FreqOut", font=("Impact", 64), fg="silver")
-        self.title.pack(padx=30, pady=60)
-        #box to enter message as well as instruction above it
-        self.messageInstr = tk.Label(self.root, text="Enter message you would like to encode (50 char max)", font=("Impact", 16),
-                                fg="silver", bg="dark green")
-        self.messageInstr.pack(padx=30, pady=5)
-        self.messagebox = tk.Entry(self.root)
-        self.messagebox.pack( padx=0, pady=0)
-       
-        #--> Replaced, now whatever text is in box will be message, no need to hit enter
-        # self.messagebox.bind("<Return>", self.enter_on_press)
+        
+        # Style
+        style = ttk.Style(self.root)
+        style.theme_use('clam')
+        style.configure('TLabel', background='dark green', foreground='silver', font=('Impact', 16))
+        style.configure('TButton', font=('Arial', 12), padding=5)
+        style.configure('TEntry', font=('Courier New', 12))
 
-        #both buttons to select files from computer
+        # Title
+        self.title = ttk.Label(self.root, text="FreqOut", font=("Impact", 64))
+        self.title.pack(padx=30, pady=30)
+        
+        # Message input
+        self.messageInstr = ttk.Label(self.root, text="Enter message you would like to encode (50 char max)")
+        self.messageInstr.pack(pady=5)
+        self.messagebox = ttk.Entry(self.root, width=60)
+        self.messagebox.pack()
+        
+        # Hit button or enter to input mesage
+        self.confirm_button = ttk.Button(self.root, text="Confirm Message", command=self.confirm_message)
+        self.confirm_button.pack(pady=5)
+        self.messagebox.bind("<Return>", lambda event: self.confirm_message())
 
-        self.inFileInstruction = tk.Label(self.root, text="Select your input file (.wav)", font=("Impact", 16), fg="silver", bg="dark green")
-        self.inFileInstruction.pack(padx=30, pady=5)
+        # Input file
+        self.inFileInstruction = ttk.Label(self.root, text="Select your input file (.wav)")
+        self.inFileInstruction.pack(pady=10)
+        self.filebutton1 = ttk.Button(self.root, text="Select .wav file", command=self.select_infile)
+        self.filebutton1.pack()
 
-        self.filebutton1 = tk.Button(self.root, text="Select .wav file", command=self.select_infile, font=("Arial"),fg="black", bg="grey")
-        self.filebutton1.pack(padx=30)
-
-        self.outFileInstruction = tk.Label(self.root, text="Select your write to file", font=("Impact", 16),
-                                          fg="silver", bg="dark green")
-        self.outFileInstruction.pack(padx=30, pady=5)
-
-        self.filebutton2 = tk.Button(self.root, text="Select .wav file", command=self.select_outfile, font=("Arial"),fg="black", bg="grey")
-        self.filebutton2.pack(padx=30)
+        # Output file
+        self.outFileInstruction = ttk.Label(self.root, text="Select your write-to file")
+        self.outFileInstruction.pack(pady=10)
+        self.filebutton2 = ttk.Button(self.root, text="Select .wav file", command=self.select_outfile)
+        self.filebutton2.pack()
 
         # Run Button
-        self.runButton = tk.Button(self.root, text="Run", command=self.run_backend, font=("Arial"), fg="white", bg="black")
+        self.runButton = ttk.Button(self.root, text="Run", command=self.run_backend)
         self.runButton.pack(pady=20)
 
         # Console Output
-        self.console = scrolledtext.ScrolledText(self.root, wrap=tk.WORD, width=100, height=20, font=("Courier", 10))
+        self.console = scrolledtext.ScrolledText(self.root, wrap=tk.WORD, width=100, height=100, font=("Courier", 10))
         self.console.pack(padx=10, pady=20)
 
         # self.root.mainloop()
 
-    # Message will be whatever is in text box 
-    # def enter_on_press(self, event):
-    #     encoded_message = self.messagebox.get()
-    #     self.message = encoded_message
-    #     self.messagebox.delete(first=0, last=len(encoded_message))
-    #     self.messagebox.configure(state="disabled")
+    # Confirm encoded message
+    def confirm_message(self):
+        self.message = self.messagebox.get()
+        if not self.message:
+            print("No message entered.")
+            return
+
+        print(f"Message to encode: {self.message}")
+        self.messagebox.configure(state='readonly')
+        self.confirm_button.configure(state='disabled')
 
     
     def select_infile(self):
