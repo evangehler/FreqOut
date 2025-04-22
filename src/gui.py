@@ -27,7 +27,6 @@ class GUI:
     # Main Configuration
     def __init__(self):
         
-    
         # Window Size / Config
         self.root = tk.Tk()
         self.root.geometry('725x800')
@@ -51,12 +50,12 @@ class GUI:
         self.notebook.pack(expand=1, fill='both', padx=10, pady=10)
 
         self.encode_tab = ttk.Frame(self.notebook) # ENCODE TAB
-        self.output_tab = ttk.Frame(self.notebook) # DECODE TAB
+        self.decode_tab = ttk.Frame(self.notebook) # DECODE TAB
 
         self.notebook.add(self.encode_tab, text='Encode Messages') # ENCODE TAB
-        self.notebook.add(self.output_tab, text='Output') # DECODE TAB?
+        self.notebook.add(self.decode_tab, text='Decode Messages') # DECODE TAB?
 
-
+        # =============== ENOCDE TAB ================== #
         # ===== Frame for inputs, all in one row-block container ===== #
         self.frame_top = ttk.Frame(self.encode_tab)
         self.frame_top.pack(pady=20, padx=40, fill='x')
@@ -73,7 +72,7 @@ class GUI:
         self.messagebox.bind("<Return>", lambda event: self.confirm_message())
 
         # Confirm Button
-        self.confirm_button = ttk.Button(self.message_frame, text="Encode Message", command=self.confirm_message)
+        self.confirm_button = ttk.Button(self.message_frame, text="Confirm", command=self.confirm_message)
         self.confirm_button.grid(row=0, column=2, padx=5)
 
         # Input File Row
@@ -97,14 +96,20 @@ class GUI:
         self.filebutton2.grid(row=0, column=1)
 
         # Run Button
-        self.runButton = ttk.Button(self.frame_top, text="Run", command=self.run_backend)
+        self.runButton = ttk.Button(self.frame_top, text="Encode Message", command=self.run_backend)
         self.runButton.pack(pady=10)
 
         # Console Output
-        self.console = scrolledtext.ScrolledText(self.output_tab, wrap=tk.WORD, width=120, height=70, font=("Courier", 10))
+        self.console = scrolledtext.ScrolledText(self.encode_tab, wrap=tk.WORD, width=120, height=70, font=("Courier", 10))
         self.console.pack(padx=10, pady=20)
 
-        # self.root.mainloop()
+        # =============== DEOCDE TAB ================== #
+        # ===== Frame ===== #
+        self.frame_top = ttk.Frame(self.decode_tab)
+        self.frame_top.pack(pady=20, padx=40, fill='x')
+
+
+
 
     # Confirm encoded message
     def confirm_message(self):
