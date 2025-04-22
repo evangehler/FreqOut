@@ -34,8 +34,10 @@ pip install -r requirements.txt
 ```
 If this does not work on your machine, manually install with:
 ```
-pip install numpy librosa matplotlib soundfile tkinter
+pip install numpy librosa matplotlib soundfile
 ```
+***Note***: *Make sure you have **tkinter** installed if you are on certain Linux distributions*
+
 Finally, navigate to source folder and run program
 ```
 cd src
