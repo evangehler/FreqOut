@@ -1,13 +1,30 @@
 import tkinter as tk
 from tkinter import filedialog as fd
+from tkinter import scrolledtext
+import sys
 
+# Class for Console Output
+class ConsoleRedirect:
+    def __init__(self, text_widget, original_stream):
+        self.text_widget = text_widget
+        self.original_stream = original_stream
+
+    def write(self, message):
+        self.text_widget.insert(tk.END, message)
+        self.text_widget.see(tk.END)
+        self.original_stream.write(message)
+
+    def flush(self):
+        self.original_stream.flush()
+# Main GUI
 class GUI:
-    message = None
-    inFile = None
-    outFile = None
-
     def __init__(self):
-        #initalize root/window
+        self.message = None
+        self.inFile = None
+        self.outFile = None
+        self.callback = None
+
+
         self.root = tk.Tk()
         self.root.geometry('1000x600')
         self.root.title("FreqOut")
@@ -44,8 +61,11 @@ class GUI:
         self.runButton = tk.Button(self.root, text="Run", command=self.run_backend, font=("Arial"), fg="white", bg="black")
         self.runButton.pack(pady=20)
 
+        # Console Output
+        self.console = scrolledtext.ScrolledText(self.root, wrap=tk.WORD, width=100, height=20, font=("Courier", 10))
+        self.console.pack(padx=10, pady=20)
 
-        self.root.mainloop()
+        # self.root.mainloop()
 
     # Message will be whatever is in text box 
     # def enter_on_press(self, event):
@@ -76,6 +96,8 @@ class GUI:
     def run_backend(self):
         self.message = self.messagebox.get()
         if self.message and self.inFile and self.outFile:
-            self.root.destroy()
+            if self.callback:
+                self.callback(self.message, self.inFile, self.outFile)
         else:
             print("Missing input. Please enter a message and select both files.")
+

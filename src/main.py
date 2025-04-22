@@ -1,11 +1,12 @@
 import numpy as np
 import librosa
 import hashlib
+import sys
 
 from classes import DeltaSlice, TimeSlice
 from audio_codec import encode_message, decode_message
-from plotting import plot_spectrogram, plot_deltas, plot_stack
-from gui import GUI
+from plotting import plot_stack
+from gui import GUI, ConsoleRedirect
 
 # Function iterates through audio file, computing and saving results of FFTs
 def compute_time_slice(filename, sr = 44100, n_fft=1024, hop_length=64):
@@ -65,31 +66,24 @@ def compute_deltas(reference_slices, test_slices, threshold=0.05, precision=3):
     print(f"{len(delta_slices)} slices had differences.")
     return delta_slices
 
-# Main
-def main():
-    # Launch GUI
-    gui = GUI()
-
-    message = gui.message
-    original_path = gui.inFile
-    doped_path = gui.outFile
-
-    if not all([message, original_path, doped_path]):
-        print("Missing required input from GUI.")
-        return
-
-    # Encode
+def run_all(message, original_path, doped_path):
+    print("Running FreqOut pipeline...")
     encode_message(message, original_path, doped_path)
-
-    # Analyze
+    
     slices_orig = compute_time_slice(original_path)
     slices_doped = compute_time_slice(doped_path)
-    deltas = compute_deltas(slices_orig, slices_doped, threshold=0.05)
-
-    # Decode & Plot
+    
+    deltas = compute_deltas(slices_orig, slices_doped)
+    
     decoded = decode_message(deltas, slices_doped[0].freqs)
     plot_stack(slices_orig, slices_doped, deltas, decoded_message=decoded)
- 
-# Main
+
+def main():
+    gui = GUI()
+    sys.stdout = ConsoleRedirect(gui.console, sys.__stdout__)
+    sys.stderr = ConsoleRedirect(gui.console, sys.__stderr__)
+    gui.callback = run_all
+    gui.root.mainloop()
+
 if __name__ == "__main__":
     main()
