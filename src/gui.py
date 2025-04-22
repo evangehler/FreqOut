@@ -93,17 +93,19 @@ class GUI:
             filetypes=(("Wav files", "*.wav"), ("mp3 files", "*.mp3"), ("All files", "*.*"))
         )
         if file_path:
-            print(f"File selected: {file_path}")
+            print(f"Input file selected: {file_path}")
             self.inFile = file_path
     
     def select_outfile(self):
-        file_path = fd.askopenfilename(
+        file_path = fd.asksaveasfilename(
             title="Select a file, must be .wav",
+            defaultextension=".wav",
+            initialfile="encoded_file.wav",
             filetypes=(("Wav files", "*.wav"), ("mp3 files", "*.mp3"), ("All files", "*.*"))
         )
         if file_path:
-            print(f"File selected: {file_path}")
             self.outFile = file_path
+            print(f"Encoded audio saved to: {file_path}")
     
     def run_backend(self):
         self.message = self.messagebox.get()
