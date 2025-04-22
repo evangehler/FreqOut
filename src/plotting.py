@@ -98,5 +98,6 @@ def plot_stack(slices_orig, slices_doped, delta_slices, decoded_message=None):
         fig.text(0.5, 0.01, f"Decoded Message: \"{decoded_message}\"",
                  ha='center', fontsize=12, bbox=dict(facecolor='white', alpha=0.8, boxstyle='round'))
 
+    plt.gcf().set_size_inches(960 / 100, 720 / 100) # Set window to 720x480
     plt.tight_layout(rect=[0, 0.03, 1, 1])  # Leave space at bottom
     plt.show()
