@@ -2,6 +2,7 @@ import numpy as np
 import librosa
 import sys
 
+from hash_generator import HashGenerator
 from classes import DeltaSlice, TimeSlice
 from audio_codec import encode_message, decode_message
 from plotting import plot_stack
@@ -26,23 +27,11 @@ def compute_time_slice(filename, sr = 44100, n_fft=1024, hop_length=64):
 
     return slices
 
-# Hash Function
-def hash_magnitudes(magnitudes, precision=3):
-    rounded = np.round(magnitudes, decimals=precision)
-    # Convert magnitudes to a flat array of bytes
-    flattened = rounded.flatten()
-    hash_value = 0
-    for val in flattened:
-        # Use XOR to mix the bits of the hashed value and 10^6 for high resolution and uniqueness
-        hash_value ^= int(val * 1e6)
-        # Bitshift multiplication by 32 and adding the original value for entropy (randomness)
-        hash_value = (hash_value << 5) + hash_value
-    return hex(hash_value & 0xFFFFFFFFFFFFFFFF)  # Return a 64-bit hash as hex
-
 # Function compares two arrays of slices and stores the resulting slices.
 def compute_deltas(reference_slices, test_slices, threshold=0.05, precision=3):
     # hash lookup for identical slices
-    ref_hashes = {hash_magnitudes(s.magnitudes, precision): s for s in reference_slices}
+    gen = HashGenerator()
+    ref_hashes = {gen.hash_values(s.magnitudes, precision): s for s in reference_slices}
 
     # Pre-index reference slices
     ref_by_time = {round(s.timestamp, 3): s for s in reference_slices}
@@ -50,7 +39,7 @@ def compute_deltas(reference_slices, test_slices, threshold=0.05, precision=3):
     delta_slices = []
 
     for test_slice in test_slices:
-        test_hash = hash_magnitudes(test_slice.magnitudes, precision)
+        test_hash = gen.hash_values(test_slice.magnitudes, precision)
 
         # Skip if identitical
         if test_hash in ref_hashes:
