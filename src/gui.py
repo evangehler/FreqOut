@@ -29,7 +29,7 @@ class GUI:
         
         # Window Size / Config
         self.root = tk.Tk()
-        self.root.geometry('800x800')
+        self.root.geometry('725x800')
         self.root.title("FreqOut")
         self.root.configure(background='dark green')
         
@@ -60,7 +60,7 @@ class GUI:
         self.messagebox.bind("<Return>", lambda event: self.confirm_message())
 
         # Confirm Button
-        self.confirm_button = ttk.Button(self.message_frame, text="Confirm Message", command=self.confirm_message)
+        self.confirm_button = ttk.Button(self.message_frame, text="Encode Message", command=self.confirm_message)
         self.confirm_button.grid(row=0, column=2, padx=5)
 
         # Input File Row
@@ -88,7 +88,7 @@ class GUI:
         self.runButton.pack(pady=10)
 
         # Console Output
-        self.console = scrolledtext.ScrolledText(self.root, wrap=tk.WORD, width=120, height=100, font=("Courier", 10))
+        self.console = scrolledtext.ScrolledText(self.root, wrap=tk.WORD, width=120, height=70, font=("Courier", 10))
         self.console.pack(padx=10, pady=20)
 
         # self.root.mainloop()
