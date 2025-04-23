@@ -2,6 +2,7 @@ import numpy as np
 import librosa
 import sys
 
+from hash_list import HashList
 from hash_generator import HashGenerator
 from classes import DeltaSlice, TimeSlice
 from audio_codec import encode_message, decode_message
@@ -9,7 +10,7 @@ from plotting import plot_stack
 from gui import GUI, ConsoleRedirect
 
 # Function iterates through audio file, computing and saving results of FFTs
-def compute_time_slice(filename, sr = 44100, n_fft=1024, hop_length=64):
+def compute_time_slices(filename, sr = 44100, n_fft=1024, hop_length=64):
     #ignore sr / make mono
     y, _ = librosa.load(filename, sr=sr, mono=True)
     #matrix of our fft bins
@@ -28,49 +29,44 @@ def compute_time_slice(filename, sr = 44100, n_fft=1024, hop_length=64):
     return slices
 
 # Function compares two arrays of slices and stores the resulting slices.
-def compute_deltas(reference_slices, test_slices, threshold=0.05, precision=3):
-    # hash lookup for identical slices
-    gen = HashGenerator()
-    ref_hashes = {gen.hash_values(s.magnitudes, precision): s for s in reference_slices}
-
-    # Pre-index reference slices
-    ref_by_time = {round(s.timestamp, 3): s for s in reference_slices}
+def compute_deltas(orig_slices, doped_slices, threshold=0.05, precision=3):
+    if len(orig_slices) != len(doped_slices):
+        print("Different number of FFT slices per file. Are the audio files different lengths?")
+        return
+    
+    orig_list = HashList(orig_slices)
+    doped_list = HashList(doped_slices)
 
     delta_slices = []
-
-    for test_slice in test_slices:
-        test_hash = gen.hash_values(test_slice.magnitudes, precision)
-
-        # Skip if identitical
-        if test_hash in ref_hashes:
+    for index, (orig_hash, doped_hash) in enumerate(zip(orig_list.get_hashes(), doped_list.get_hashes())):
+        if orig_hash == doped_hash:
             continue
-
-        # Get reference frame via rounded timestamp
-        ref_slice = ref_by_time.get(round(test_slice.timestamp, 3))
-
-        if ref_slice:
-            delta = np.abs(test_slice.magnitudes - ref_slice.magnitudes)
+        else:
+            orig_diff = orig_slices[index]
+            doped_diff = doped_slices[index]
+            delta = np.abs(orig_diff.magnitudes - doped_diff.magnitudes)
             significant = delta > threshold
             if np.any(significant):
                 indices = np.where(significant)[0]
                 deltas = delta[indices]
                 delta_slices.append(DeltaSlice(
-                    timestamp=test_slice.timestamp,
+                    timestamp=orig_diff.timestamp,
                     freq_indices=indices,
                     magnitude_deltas=deltas
                 ))
+                
     print(f"{len(delta_slices)} slices had differences.")
     return delta_slices
 
-def run_encode(message, original_path, doped_path):
+def run_encode(message, orig_path, doped_path):
     print("Encoding message...")
-    encode_message(message, original_path, doped_path)
+    encode_message(message, orig_path, doped_path)
     print("Done encoding.")
 
-def run_decode(reference_path, test_path):
+def run_decode(orig_path, doped_path):
     print("Running decode pipeline...")
-    slices_orig = compute_time_slice(reference_path)
-    slices_doped = compute_time_slice(test_path)
+    slices_orig = compute_time_slices(orig_path)
+    slices_doped = compute_time_slices(doped_path)
 
     deltas = compute_deltas(slices_orig, slices_doped)
 

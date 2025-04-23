@@ -1,7 +1,7 @@
 import numpy as np
 class HashGenerator:
-    def hash_values(self, values, precision=3):
-        rounded = np.round(values, decimals=precision)
+    def hash_items(self, items, precision=3):
+        rounded = np.round(items, decimals=precision)
         # Convert magnitudes to a flat array of bytes
         flattened = rounded.flatten()
         hash_value = 0
