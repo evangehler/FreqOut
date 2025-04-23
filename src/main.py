@@ -1,3 +1,6 @@
+# DSA FINAL PROJECT
+# Evan Gehler, Thomas Miller, Jack Payne
+# AXL.audio
 import numpy as np
 import librosa
 import sys
