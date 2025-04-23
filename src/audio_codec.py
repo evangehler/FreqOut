@@ -2,7 +2,7 @@ import numpy as np
 import librosa
 import soundfile as sf
 
-from classes import DeltaSlice
+from slice_types import DeltaSlice
 
 # Guess frequency based on weighted average of deltaSlices
 def resolve_frequency(delta_slice, freqs_full):

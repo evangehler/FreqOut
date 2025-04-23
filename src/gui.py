@@ -30,7 +30,7 @@ class GUI:
         
         # Window Size / Config
         self.root = tk.Tk()
-        self.root.geometry('720x480')
+        self.root.geometry('720x520')
         self.root.title("FreqOut")
         self.root.configure(background='dark green')
         

@@ -4,7 +4,7 @@ import sys
 
 from hash_list import HashList
 from hash_generator import HashGenerator
-from classes import DeltaSlice, TimeSlice
+from slice_types import DeltaSlice, TimeSlice
 from audio_codec import encode_message, decode_message
 from plotting import plot_stack
 from gui import GUI, ConsoleRedirect
